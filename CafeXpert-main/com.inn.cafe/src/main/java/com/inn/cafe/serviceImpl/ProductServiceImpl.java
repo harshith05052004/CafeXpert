@@ -21,10 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
+import com.inn.cafe.dto.ProductDto;
+import com.inn.cafe.exception.BaseException;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -46,7 +49,8 @@ public class ProductServiceImpl implements ProductService {
     EmailUtils emailUtil;
 
     @Override
-    public ResponseEntity<String> addNewProduct(Map<String, String> requestMap) {
+    @Transactional
+    public ResponseEntity<String> addNewProduct(ProductDto requestMap) throws Exception {
         log.info("Inside addNewProduct{}", requestMap);
         try {
             if (jwtFilter.isAdmin()) {
@@ -59,6 +63,10 @@ public class ProductServiceImpl implements ProductService {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         //System.out.println(CafeConstants.SOMETHING_WENT_WRONG);
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,18 +74,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<List<ProductWrapper>> getAllProduct() {
+    public ResponseEntity<List<com.inn.cafe.dto.ProductDto>> searchProductsByName(String name) throws Exception {
+        try {
+            // This implementation currently returns all products, as per the provided snippet.
+            // A proper implementation would involve a productDao method like productDao.findByNameContaining(name)
+            // and mapping the results to ProductDto.
+            return new ResponseEntity<>(productDao.getAllProduct(), HttpStatus.OK);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        // This return statement is unreachable if exceptions are always thrown or caught.
+        // It's kept for consistency with the original structure if no exception is thrown.
+        // return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getAllProduct() throws Exception {
         try {
             return new ResponseEntity<>(productDao.getAllProduct(), HttpStatus.OK);
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
     @Override
-    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
+    @Transactional
+    public ResponseEntity<String> updateProduct(ProductDto requestMap) throws Exception {
         try {
             if (jwtFilter.isAdmin()) {
                 // Log the incoming request map
@@ -88,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
                 System.out.println("Is Valid Product Map: " + isValid);
 
                 if (isValid) {
-                    Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+                    Optional<Product> optional = productDao.findById(requestMap.getId());
                     if (!optional.isEmpty()) {
                         productDao.save(getProductFromMap(requestMap, true));
                         return CafeUtils.getResponseEntity("Product is updated successfully", HttpStatus.OK);
@@ -103,6 +135,10 @@ public class ProductServiceImpl implements ProductService {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -132,7 +168,8 @@ public class ProductServiceImpl implements ProductService {
 //    }
 
     @Override
-    public ResponseEntity<String> deleteProduct(Integer id) {
+    @Transactional
+    public ResponseEntity<String> deleteProduct(Integer id) throws Exception {
         try {
             if (jwtFilter.isAdmin()) {
                 Optional optional = productDao.findById(id);
@@ -148,6 +185,10 @@ public class ProductServiceImpl implements ProductService {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         //System.out.println(CafeConstants.SOMETHING_WENT_WRONG);
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -165,6 +206,10 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -172,42 +217,51 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ResponseEntity<ProductWrapper> getById(Integer id) {
+    public ResponseEntity<ProductWrapper> getById(Integer id) throws Exception {
         try {
             return new ResponseEntity<>(productDao.getProductById(id), HttpStatus.OK);
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return new ResponseEntity<>(new ProductWrapper(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> updateStatus(Map<String, String> requestMap) {
+    @Transactional
+    public ResponseEntity<String> updateStatus(Integer id, String status) throws Exception {
         try {
             if (jwtFilter.isAdmin()) {
-                Optional optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+                Optional optional = productDao.findById(id);
                 if (!optional.isEmpty()) {
-                    productDao.updateProductStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    productDao.updateProductStatus(status, id);
                     return CafeUtils.getResponseEntity("Product status is updated successfully", HttpStatus.OK);
                 }
                 return CafeUtils.getResponseEntity("Product id doesn't exist", HttpStatus.OK);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            if (ex instanceof BaseException) {
+                throw (BaseException) ex;
+            }
+            throw new BaseException("Something went wrong: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
-    private boolean validateProductMap(Map<String, String> requestMap, boolean validateId) {
-        // Check if the requestMap is null or empty
-        if (requestMap == null || requestMap.isEmpty()) {
-            System.out.println("Request map is null or empty.");
+    private boolean validateProductMap(ProductDto requestMap, boolean validateId) {
+        // Check if the requestMap is null
+        if (requestMap == null) {
+            System.out.println("Request map is null.");
             return false;
         }
 
         // Check for the 'name' key and ensure it has a non-empty value
-        String name = requestMap.get("name");
+        String name = requestMap.getName();
         if (name == null || name.trim().isEmpty()) {
             System.out.println("Invalid or missing 'name' key.");
             return false;
@@ -215,8 +269,8 @@ public class ProductServiceImpl implements ProductService {
 
         // If validateId is true, check for the 'id' key and ensure it has a non-empty value
         if (validateId) {
-            String id = requestMap.get("id");
-            if (id == null || id.trim().isEmpty()) {
+            Integer id = requestMap.getId();
+            if (id == null) {
                 System.out.println("Invalid or missing 'id' key.");
                 return false;
             }
@@ -227,20 +281,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
+    private Product getProductFromMap(ProductDto requestMap, boolean isAdd) {
         Product product = new Product();
         Category category = new Category();
-        category.setId(Integer.parseInt(requestMap.get("categoryId")));
+        category.setId(requestMap.getCategoryId());
 
         if (isAdd) {
-            product.setId(Integer.parseInt(requestMap.get("id")));
+            product.setId(requestMap.getId());
         } else {
             product.setStatus("true");
         }
         product.setCategory(category);
-        product.setName(requestMap.get("name"));
-        product.setDescription(requestMap.get("description"));
-        product.setPrice(Integer.parseInt(requestMap.get("price")));
+        product.setName(requestMap.getName());
+        product.setDescription(requestMap.getDescription());
+        product.setPrice(requestMap.getPrice());
         product.setStatus(String.valueOf(isAdd));
 
         return product;

@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.inn.cafe.dto.CategoryDto;
+import com.inn.cafe.dto.ProductDto;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class CategoryRestImpl implements CategoryRest {
@@ -21,35 +23,60 @@ public class CategoryRestImpl implements CategoryRest {
     CategoryService categoryService;
 
     @Override
-    public ResponseEntity<String> addNewCategory(Map<String, String> requestMap) {
+    public ResponseEntity<String> addNewCategory(CategoryDto requestMap) throws Exception {
 
         try{
             return categoryService.addNewCategory(requestMap);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<List<Category>> getAllCategory(String filterValue) {
+    public ResponseEntity<List<Category>> getAllCategory(String filterValue) throws Exception {
         try{
             return categoryService.getAllCategory(filterValue);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return new ResponseEntity<List<Category>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {
+    public ResponseEntity<String> updateCategory(CategoryDto requestMap) throws Exception {
         try{
             return categoryService.updateCategory(requestMap);
-        }catch(Exception e){
+        } catch (Exception e){
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductDto>> getProductList(String category) throws Exception {
+        try{
+            return categoryService.getProductList(category);
+        } catch (Exception e){
+            e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return new ResponseEntity<List<ProductDto>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

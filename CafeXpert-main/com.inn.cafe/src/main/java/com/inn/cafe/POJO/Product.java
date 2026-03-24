@@ -17,13 +17,11 @@ import javax.persistence.*;
         query = "SELECT new com.inn.cafe.wrapper.ProductWrapper(p.id, p.name, p.description ,p.price, p.category.name,p.category.id, p.status) " +
                 "FROM Product p " +
                 "WHERE p.category.id = :id AND p.status = 'false'"
+)@NamedQuery(
+        name = "Product.searchProductsByName",
+        query = "select new com.inn.cafe.dto.ProductDto(p.id, p.name, p.description, p.price, p.category.name, p.category.id, p.status) " +
+                "from Product p where lower(p.name) like lower(concat('%', :name, '%'))"
 )
-
-
-
-
-
-
 
 
 

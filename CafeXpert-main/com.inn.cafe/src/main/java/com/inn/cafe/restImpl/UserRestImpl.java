@@ -11,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.inn.cafe.dto.ChangePasswordDto;
+import com.inn.cafe.dto.UserDto;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class UserRestImpl implements UserRest {
@@ -22,74 +24,138 @@ public class UserRestImpl implements UserRest {
     UserService userService;
 
     @Override
-    public ResponseEntity<String> signUp(Map<String, String> requestMap) {
+    public ResponseEntity<String> signUp(UserDto requestMap) throws Exception {
         try{
             return userService.signUp(requestMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> login(Map<String, String> requestMap) {
+    public ResponseEntity<String> login(UserDto requestMap) throws Exception {
         try{
             return userService.login(requestMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<List<UserWrapper>> getAllUser() {
+    public ResponseEntity<List<UserWrapper>> getAllUser() throws Exception {
         try{
             return userService.getAllUser();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> update(Map<String, String> requestMap) {
+    public ResponseEntity<String> update(UserDto requestMap) throws Exception {
         try{
             return userService.update(requestMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> checkToken() {
+    public ResponseEntity<String> checkToken() throws Exception {
         try{
             return userService.checkToken();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+    public ResponseEntity<String> changePassword(ChangePasswordDto requestMap) throws Exception {
         try{
             return userService.changePassword(requestMap);
         }catch(Exception e){
             e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
+    public ResponseEntity<String> generateOtp(UserDto requestMap) throws Exception {
+        try{
+            return userService.generateOtp(requestMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e instanceof com.inn.cafe.exception.BaseException) {
+                throw (com.inn.cafe.exception.BaseException) e;
+            }
+            throw new com.inn.cafe.exception.BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> verifyOtp(UserDto requestMap) throws Exception {
+        try{
+            return userService.verifyOtp(requestMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e instanceof com.inn.cafe.exception.BaseException) {
+                throw (com.inn.cafe.exception.BaseException) e;
+            }
+            throw new com.inn.cafe.exception.BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> setPassword(UserDto requestMap) throws Exception {
+        try{
+            return userService.setPassword(requestMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e instanceof com.inn.cafe.exception.BaseException) {
+                throw (com.inn.cafe.exception.BaseException) e;
+            }
+            throw new com.inn.cafe.exception.BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> forgotPassword(UserDto requestMap) throws Exception {
         try{
             return userService.forgotPassword(requestMap);
         }catch(Exception e){
             e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
 
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);

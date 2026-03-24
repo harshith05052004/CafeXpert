@@ -1,0 +1,21 @@
+package com.inn.cafe.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AddressDto {
+    private Integer id;
+    private String streetName;
+    private String line2;
+    private String line3;
+    private String pincode;
+    private String city;
+    private String state;
+    private String country;
+    private String addressName;
+    private Integer recentlyUsed;
+}

@@ -13,9 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.inn.cafe.exception.BaseException;
+
+import com.inn.cafe.dto.CategoryDto;
+import com.inn.cafe.dto.ProductDto;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -29,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     JwtFilter jwtFilter;
 
     @Override
-    public ResponseEntity<String> addNewCategory(Map<String, String> requestMap) {
+    public ResponseEntity<String> addNewCategory(CategoryDto requestMap) throws Exception {
         try{
             if(jwtFilter.isAdmin()){
                 if(validateCategoryMap(requestMap, false)){
@@ -41,14 +45,18 @@ public class CategoryServiceImpl implements CategoryService {
                 return CafeUtils.getResponseEntity("Unauthorized Access", HttpStatus.UNAUTHORIZED);
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<List<Category>> getAllCategory(String filterValue) {
+    public ResponseEntity<List<Category>> getAllCategory(String filterValue) throws Exception {
         try{
             if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
                 log.info("Inside if");
@@ -56,19 +64,23 @@ public class CategoryServiceImpl implements CategoryService {
             }
 
             return new ResponseEntity<List<Category>>(categoryDao.findAll(), HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
         return new ResponseEntity<List<Category>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {
+    public ResponseEntity<String> updateCategory(CategoryDto requestMap) throws Exception {
         try{
             if(jwtFilter.isAdmin()){
                 if(validateCategoryMap(requestMap, true)){
-                    Optional optional = categoryDao.findById(Integer.parseInt(requestMap.get("id")));
+                    Optional optional = categoryDao.findById(requestMap.getId());
                     if(!optional.isEmpty()){
                         categoryDao.save(getCategoryFromMap(requestMap, true));
                         return CafeUtils.getResponseEntity("Category Updated Successfully", HttpStatus.OK);
@@ -79,18 +91,21 @@ public class CategoryServiceImpl implements CategoryService {
                 return CafeUtils.getResponseEntity("Invalid Data", HttpStatus.BAD_REQUEST);
             }
             return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
         return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private boolean validateCategoryMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("name")){
-            if(requestMap.containsKey("id") && validateId){
+    private boolean validateCategoryMap(CategoryDto requestMap, boolean validateId) {
+        if(requestMap.getName() != null && !requestMap.getName().isEmpty()){
+            if(requestMap.getId() != null && validateId){
                 return true;
             }
-
             else if(!validateId){
                 return true;
             }
@@ -98,14 +113,29 @@ public class CategoryServiceImpl implements CategoryService {
         return false;
     }
 
-    private Category getCategoryFromMap(Map<String, String> requestMap,boolean isAdd){
+    private Category getCategoryFromMap(CategoryDto requestMap,boolean isAdd){
         Category category = new Category();
 
         if(isAdd){
-            category.setId(Integer.parseInt(requestMap.get("id")));
+            category.setId(requestMap.getId());
         }
 
-        category.setName(requestMap.get("name"));
+        category.setName(requestMap.getName());
         return category;
     }
+
+    @Override
+    public ResponseEntity<List<ProductDto>> getProductList(String category) throws Exception {
+        try{
+            return new ResponseEntity<>(categoryDao.getByCategory(category), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e instanceof BaseException) {
+                throw (BaseException) e;
+            }
+            throw new BaseException("Something went wrong: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return new ResponseEntity<List<ProductDto>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+        
 }

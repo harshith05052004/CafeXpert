@@ -10,24 +10,26 @@ import java.util.Map;
 @RequestMapping(path = "/product")
 public interface ProductRest {
 
+import com.inn.cafe.dto.ProductDto;
+
     @PostMapping(path = "/add")
-    ResponseEntity<String> addNewProduct(@RequestBody Map<String, String> requestMap);
+    ResponseEntity<String> addNewProduct(@RequestBody ProductDto productDto) throws Exception;
 
     @GetMapping(path = "/get")
-    ResponseEntity<List<ProductWrapper>> getAllProduct();
+    ResponseEntity<List<ProductWrapper>> getAllProduct() throws Exception;
 
     @PostMapping(path = "/update")
-    ResponseEntity<String> updateProduct(@RequestBody Map<String, String> requestMap);
+    ResponseEntity<String> updateProduct(@RequestBody ProductDto productDto) throws Exception;
 
     @PostMapping(path = "/delete/{id}")
-    ResponseEntity<String> deleteProduct(@PathVariable Integer id);
+    ResponseEntity<String> deleteProduct(@PathVariable Integer id) throws Exception;
 
     @PostMapping(path = "/updateStatus")
-    ResponseEntity<String> updateStatus(@RequestBody Map<String, String> requestMap);
-
-    @GetMapping(path = "/getByCategory/{id}")
-    ResponseEntity<List<ProductWrapper>> getByCategory(@PathVariable Integer id);
+    ResponseEntity<String> updateStatus(@RequestParam("id") Integer id, @RequestParam("status") String status) throws Exception;
 
     @GetMapping(path = "/getById/{id}")
-    ResponseEntity<ProductWrapper> getById(@PathVariable Integer id);
+    ResponseEntity<ProductWrapper> getById(@PathVariable Integer id) throws Exception;
+
+    @GetMapping(path = "/search/{name}")
+    ResponseEntity<List<com.inn.cafe.dto.ProductDto>> searchProductsByName(@PathVariable String name);
 }

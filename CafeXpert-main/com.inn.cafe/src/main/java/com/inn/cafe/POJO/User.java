@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @NamedQuery(name = "User.findByEmailId", query = "select u from User u where u.email=:email")
 
@@ -47,5 +48,7 @@ public class User implements Serializable {
     @Column(name = "role")
     private String role;
 
+    @OneToMany(mappedBy = "user")
+    private List<Address> addresses;
 
 }

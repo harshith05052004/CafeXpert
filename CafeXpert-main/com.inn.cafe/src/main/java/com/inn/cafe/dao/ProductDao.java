@@ -22,4 +22,7 @@ public interface ProductDao extends JpaRepository<Product, Integer> {
     List<ProductWrapper> getByCategory(@Param("id") Integer id);
 
     ProductWrapper getProductById(@Param("id") Integer id);
+
+    @Query(name = "Product.searchProductsByName")
+    List<com.inn.cafe.dto.ProductDto> searchProductsByName(@Param("name") String name);
 }

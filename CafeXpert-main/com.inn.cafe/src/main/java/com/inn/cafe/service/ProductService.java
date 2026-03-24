@@ -11,17 +11,19 @@ import java.util.Map;
 
 public interface ProductService {
 
-    ResponseEntity<String> addNewProduct(Map<String, String> requestMap);
+import com.inn.cafe.dto.ProductDto;
 
-    ResponseEntity<List<ProductWrapper>> getAllProduct();
+    ResponseEntity<String> addNewProduct(ProductDto requestMap) throws Exception;
 
-    ResponseEntity<String> updateProduct(Map<String, String> requestMap);
+    ResponseEntity<List<ProductWrapper>> getAllProduct() throws Exception;
 
-    ResponseEntity<String> deleteProduct(Integer id);
+    ResponseEntity<String> updateProduct(ProductDto requestMap) throws Exception;
+
+    ResponseEntity<String> deleteProduct(Integer id) throws Exception;
 
     ResponseEntity<ProductWrapper> getById(Integer id);
 
-    ResponseEntity<String> updateStatus(Map<String, String> requestMap);
+    ResponseEntity<String> updateStatus(Integer id, String status) throws Exception;
 
-    ResponseEntity<List<ProductWrapper>> getByCategory(Integer id);
+    ResponseEntity<List<com.inn.cafe.dto.ProductDto>> searchProductsByName(String name) throws Exception;
 }
