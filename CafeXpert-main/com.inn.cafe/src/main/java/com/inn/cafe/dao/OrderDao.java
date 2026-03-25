@@ -9,4 +9,5 @@ import java.util.List;
 public interface OrderDao extends JpaRepository<Order, Integer> {
     List<Order> getAllOrders();
     List<Order> getOrderByUserId(@Param("userId") Integer userId);
+    Order findFirstByUserIdOrderByIdDesc(Integer userId);
 }

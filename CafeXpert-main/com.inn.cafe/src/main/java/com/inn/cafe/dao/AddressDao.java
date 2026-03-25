@@ -9,4 +9,5 @@ import java.util.List;
 public interface AddressDao extends JpaRepository<Address, Integer> {
     List<Address> findByUserId(@Param("userId") Integer userId);
     Address findByUserIdAndAddressName(@Param("userId") Integer userId, @Param("addressName") String addressName);
+    Address findByUserIdAndRecentlyUsed(@Param("userId") Integer userId, @Param("recentlyUsed") Integer recentlyUsed);
 }

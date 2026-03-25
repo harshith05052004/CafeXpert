@@ -52,5 +52,30 @@ public class CafeUtils {
         return new HashMap<>();
     }
 
+    public static java.util.List<com.inn.cafe.dto.ProductDto> getOrderAgainDtos(java.util.List<com.inn.cafe.POJO.Product> products) {
+        java.util.List<com.inn.cafe.dto.ProductDto> dtos = new java.util.ArrayList<>();
+        if (products != null) {
+            for (com.inn.cafe.POJO.Product p : products) {
+                dtos.add(new com.inn.cafe.dto.ProductDto(p.getId(), p.getName(), p.getDescription(), p.getPrice(), p.getCategory().getName(), p.getCategory().getId(), p.getStatus()));
+            }
+        }
+        return dtos;
+    }
+
+    public static java.util.List<com.inn.cafe.dto.OrderItemDto> getRecentOrderDtos(com.inn.cafe.POJO.Order recentOrder) {
+        java.util.List<com.inn.cafe.dto.OrderItemDto> dtos = new java.util.ArrayList<>();
+        if (recentOrder != null && recentOrder.getOrderItems() != null) {
+            for (com.inn.cafe.POJO.OrderItem item : recentOrder.getOrderItems()) {
+                com.inn.cafe.dto.OrderItemDto dto = new com.inn.cafe.dto.OrderItemDto();
+                dto.setId(item.getId());
+                dto.setProductId(item.getProduct().getId());
+                dto.setProductName(item.getProduct().getName());
+                dto.setQuantity(item.getQuantity());
+                dto.setPrice(item.getPrice());
+                dtos.add(dto);
+            }
+        }
+        return dtos;
+    }
 
 }

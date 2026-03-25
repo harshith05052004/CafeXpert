@@ -1,9 +1,9 @@
 package com.inn.cafe.service;
 
 import org.springframework.http.ResponseEntity;
-
-import java.util.Map;
+import com.inn.cafe.dto.DashboardDto;
 
 public interface DashboardService {
-    ResponseEntity<Map<String, Object>> getCount();
+
+    ResponseEntity<DashboardDto> getDashboardDetails();
 }
